@@ -1,0 +1,10 @@
+^C:\USERS\DINES\.GEMINI\ANTIGRAVITY\SCRATCH\CVM\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dines/.gemini/antigravity/scratch/cvm -BC:/Users/dines/.gemini/antigravity/scratch/cvm/build --check-stamp-file C:/Users/dines/.gemini/antigravity/scratch/cvm/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
