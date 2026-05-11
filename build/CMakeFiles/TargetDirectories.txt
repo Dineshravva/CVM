@@ -1,3 +1,0 @@
-C:/Users/dines/.gemini/antigravity/scratch/cvm/build/CMakeFiles/cvm.dir
-C:/Users/dines/.gemini/antigravity/scratch/cvm/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/dines/.gemini/antigravity/scratch/cvm/build/CMakeFiles/ZERO_CHECK.dir
