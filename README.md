@@ -16,7 +16,7 @@ This project implements a custom stack-based virtual machine and compiler in sta
 - `VM`: Executes the bytecode using a stack-based evaluation loop.
 
 ## How to Build
-You need CMake and a C++17 compatible compiler.
+You need CMake and a C++20 compatible compiler.
 
 1. Create a build directory:
    ```bash
