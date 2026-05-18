@@ -30,11 +30,19 @@ You need CMake and a C++20 compatible compiler.
    ```
 
 ## How to Run
-After building, an executable named `cvm` (or `cvm.exe` on Windows) will be generated.
-You can run it by passing a script file as an argument.
 
-```bash
-./cvm ../script.cvm
+After building the project, the executable will be generated.
+
+On Windows using Visual Studio/MSVC:
+
+```powershell
+.\Debug\cvm.exe ..\script.cvm
+```
+
+If the executable is generated directly inside the build folder:
+
+```powershell
+.\cvm.exe ..\script.cvm
 ```
 
 ## Packaging for your team
