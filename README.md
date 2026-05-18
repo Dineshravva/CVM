@@ -1,6 +1,6 @@
 # CVM - Stack-Based Virtual Machine & Compiler
 
-This project implements a custom stack-based virtual machine and compiler in standard C++17, following recursive descent parsing and lexing principles.
+This project implements a custom stack-based virtual machine and compiler in standard C++20, following recursive descent parsing and lexing principles.
 
 ## Features
 - **Data Types**: Integers (`int64_t`) and Booleans.
