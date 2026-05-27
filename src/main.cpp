@@ -42,7 +42,10 @@ int main(int argc, char* argv[]) {
         
 
         //new bytecode better
-        Disassembler::print(bytecode);
+        Disassembler::print(
+            bytecode,
+            compiler.getVariableNames()
+        );
 
         VM vm;
         vm.execute(bytecode);

@@ -48,16 +48,30 @@ uint8_t Compiler::resolveVariable(const std::string& name) {
     return globals[name];
 }
 
-uint8_t Compiler::declareVariable(const std::string& name) {
-    if (globals.find(name) != globals.end()) {
-        throw std::runtime_error("Variable already declared: " + name);
-    }
-    if (nextVarIdx >= 255) {
-        throw std::runtime_error("Too many variables");
-    }
-    globals[name] = nextVarIdx;
-    return nextVarIdx++;
-}
+        uint8_t Compiler::declareVariable(
+        const std::string& name)
+        {
+            if(globals.find(name)!=globals.end()){
+
+                throw std::runtime_error(
+                "Variable already declared: "
+                +name
+                );
+            }
+
+            if(nextVarIdx>=255){
+
+                throw std::runtime_error(
+                "Too many variables"
+                );
+            }
+
+            globals[name]=nextVarIdx;
+
+            reverseGlobals[nextVarIdx]=name;
+
+            return nextVarIdx++;
+        }
 
 void Compiler::compileStmt(Stmt* stmt) {
     if (auto* s = dynamic_cast<LetStmt*>(stmt)) {
