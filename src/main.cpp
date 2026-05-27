@@ -56,7 +56,9 @@ int main(int argc,char* argv[])
                     <<":quit\n"
                     <<":clear\n"
                     <<":disasm on\n"
-                    <<":disasm off\n\n";
+                    <<":disasm off\n"
+                    <<":debug on\n"
+                    <<":debug off\n\n";
 
                     continue;
                 }
@@ -77,6 +79,26 @@ int main(int argc,char* argv[])
 
                     std::cout
                     <<"Disassembler enabled\n";
+
+                    continue;
+                }
+
+                if(line==":debug on"){
+
+                    vm.setDebug(true);
+
+                    std::cout
+                    <<"Debug enabled\n";
+
+                    continue;
+                }
+
+                if(line==":debug off"){
+
+                    vm.setDebug(false);
+
+                    std::cout
+                    <<"Debug disabled\n";
 
                     continue;
                 }
