@@ -1,6 +1,7 @@
 #include "VM.h"
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 
 VM::VM() : variables(256) {}
 
@@ -349,9 +350,16 @@ const std::vector<uint8_t>& bytecode
 
             std::cin>>val;
 
+            std::cin.ignore(
+                std::numeric_limits<std::streamsize>::max(),
+                '\n'
+            );
+
             Value temp;
+
             temp.type=
             Value::Type::INT;
+
             temp.as.i=val;
 
             push(temp);
