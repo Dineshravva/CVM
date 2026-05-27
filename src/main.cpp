@@ -3,54 +3,279 @@
 #include "Compiler.h"
 #include "VM.h"
 #include "Disassembler.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: cvm <script.cvm>\n";
-        return 1;
-    }
+int main(int argc,char* argv[])
+{
+    Compiler compiler;
+    VM vm;
 
-    std::ifstream file(argv[1]);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << argv[1] << "\n";
-        return 1;
-    }
+    bool showDisasm=true;
 
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string source = buffer.str();
+    try{
 
-    try {
-        Lexer lexer(source);
-        std::vector<Token> tokens = lexer.tokenize();
-        
-        Parser parser(tokens);
-        auto stmts = parser.parse();
+        if(argc==1){
 
-        Compiler compiler;
-        std::vector<uint8_t> bytecode = compiler.compile(stmts);
+            std::cout
+            <<"===== CVM REPL =====\n";
 
-        // Print bytecode
-        // std::cout << "--- Bytecode ---" << std::endl;
-        // for (size_t i = 0; i < bytecode.size(); i++) {
-        //     std::cout << std::hex << (int)bytecode[i] << " ";
-        // }
-        // std::cout << std::dec << "\n----------------\n" << std::endl;
-        
+            std::cout
+            <<"Type :help for commands\n\n";
 
-        //new bytecode better
-        Disassembler::print(
-            bytecode,
-            compiler.getVariableNames()
+            while(true){
+
+                std::string source;
+                std::string line;
+
+                int openBraces=0;
+
+                std::cout
+                <<"CVM> ";
+
+                std::getline(
+                std::cin,
+                line
+                );
+
+                // COMMANDS
+
+                if(line==":quit" ||
+                   line=="exit"){
+
+                    break;
+                }
+
+                if(line==":help"){
+
+                    std::cout
+                    <<"\nCommands:\n"
+                    <<":help\n"
+                    <<":quit\n"
+                    <<":clear\n"
+                    <<":disasm on\n"
+                    <<":disasm off\n"
+                    <<":debug on\n"
+                    <<":debug off\n\n";
+
+                    continue;
+                }
+
+                if(line==":clear"){
+
+                    for(int i=0;i<30;i++){
+
+                        std::cout<<"\n";
+                    }
+
+                    continue;
+                }
+
+                if(line==":disasm on"){
+
+                    showDisasm=true;
+
+                    std::cout
+                    <<"Disassembler enabled\n";
+
+                    continue;
+                }
+
+                if(line==":debug on"){
+
+                    vm.setDebug(true);
+
+                    std::cout
+                    <<"Debug enabled\n";
+
+                    continue;
+                }
+
+                if(line==":debug off"){
+
+                    vm.setDebug(false);
+
+                    std::cout
+                    <<"Debug disabled\n";
+
+                    continue;
+                }
+
+                if(line==":disasm off"){
+
+                    showDisasm=false;
+
+                    std::cout
+                    <<"Disassembler disabled\n";
+
+                    continue;
+                }
+
+                if(line.empty()){
+
+                    continue;
+                }
+
+                source+=line+"\n";
+
+                for(char c:line){
+
+                    if(c=='{')
+                        openBraces++;
+
+                    else if(c=='}')
+                        openBraces--;
+                }
+
+                while(openBraces>0){
+
+                    std::cout
+                    <<"... ";
+
+                    std::getline(
+                    std::cin,
+                    line
+                    );
+
+                    source+=line+"\n";
+
+                    for(char c:line){
+
+                        if(c=='{')
+                            openBraces++;
+
+                        else if(c=='}')
+                            openBraces--;
+                    }
+                }
+
+                try{
+
+                    Lexer lexer(
+                    source
+                    );
+
+                    auto tokens=
+                    lexer.tokenize();
+
+                    Parser parser(
+                    tokens
+                    );
+
+                    auto stmts=
+                    parser.parse();
+
+                    auto bytecode=
+
+                    compiler.compile(
+                    stmts
+                    );
+
+                    if(showDisasm){
+
+                        Disassembler::print(
+
+                        bytecode,
+
+                        compiler.getVariableNames()
+
+                        );
+                    }
+
+                    vm.execute(
+                    bytecode
+                    );
+                }
+
+                catch(
+                const std::exception& e
+                ){
+
+                    std::cerr
+                    <<"Error: "
+                    <<e.what()
+                    <<"\n";
+                }
+            }
+
+            return 0;
+        }
+
+        if(argc!=2){
+
+            std::cerr
+            <<"Usage: cvm <script.cvm>\n";
+
+            return 1;
+        }
+
+        std::ifstream file(
+        argv[1]
         );
 
-        VM vm;
-        vm.execute(bytecode);
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
+        if(!file.is_open()){
+
+            std::cerr
+            <<"Failed to open file: "
+            <<argv[1]
+            <<"\n";
+
+            return 1;
+        }
+
+        std::stringstream buffer;
+
+        buffer
+        <<file.rdbuf();
+
+        std::string source=
+        buffer.str();
+
+        Lexer lexer(
+        source
+        );
+
+        auto tokens=
+        lexer.tokenize();
+
+        Parser parser(
+        tokens
+        );
+
+        auto stmts=
+        parser.parse();
+
+        auto bytecode=
+        compiler.compile(
+        stmts
+        );
+
+        if(showDisasm){
+
+            Disassembler::print(
+
+            bytecode,
+
+            compiler.getVariableNames()
+            );
+        }
+
+        vm.execute(
+        bytecode
+        );
+    }
+
+    catch(
+    const std::exception& e
+    ){
+
+        std::cerr
+        <<"Error: "
+        <<e.what()
+        <<"\n";
+
         return 1;
     }
 

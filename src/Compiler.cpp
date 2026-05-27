@@ -4,11 +4,22 @@
 
 Compiler::Compiler() {}
 
-std::vector<uint8_t> Compiler::compile(const std::vector<std::unique_ptr<Stmt>>& stmts) {
-    for (const auto& stmt : stmts) {
+std::vector<uint8_t> Compiler::compile(
+const std::vector<std::unique_ptr<Stmt>>& stmts)
+{
+    bytecode.clear();
+
+    for(const auto& stmt:stmts){
+
         compileStmt(stmt.get());
+
     }
-    emitByte(static_cast<uint8_t>(Opcode::HALT));
+
+    emitByte(
+    static_cast<uint8_t>(
+    Opcode::HALT
+    ));
+
     return bytecode;
 }
 

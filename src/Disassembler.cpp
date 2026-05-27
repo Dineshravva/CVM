@@ -12,7 +12,8 @@ int64_t val=0;
 
 for(int i=0;i<8;i++){
 
-val |=
+val|=
+
 static_cast<int64_t>(
 bytecode[ip++]
 )
@@ -21,7 +22,6 @@ bytecode[ip++]
 }
 
 return val;
-
 }
 
 int32_t Disassembler::readInt32(
@@ -33,7 +33,8 @@ int32_t val=0;
 
 for(int i=0;i<4;i++){
 
-val |=
+val|=
+
 static_cast<int32_t>(
 bytecode[ip++]
 )
@@ -42,8 +43,83 @@ bytecode[ip++]
 }
 
 return val;
-
 }
+
+
+std::unordered_map<
+int,
+std::string
+>
+Disassembler::collectLabels(
+
+const std::vector<uint8_t>& bytecode
+){
+
+std::unordered_map<
+int,
+std::string
+> labels;
+
+size_t ip=0;
+
+int labelNum=0;
+
+while(ip<bytecode.size()){
+
+Opcode op=
+static_cast<Opcode>(
+bytecode[ip++]
+);
+
+switch(op){
+
+case Opcode::PUSH_INT:
+ip+=8;
+break;
+
+case Opcode::PUSH_BOOL:
+ip+=1;
+break;
+
+case Opcode::STORE_VAR:
+case Opcode::LOAD_VAR:
+ip+=1;
+break;
+
+case Opcode::JUMP:
+case Opcode::JUMP_IF_FALSE:{
+
+int32_t offset=
+readInt32(
+bytecode,
+ip
+);
+
+int target=
+static_cast<int>(
+ip+offset
+);
+
+if(!labels.count(target)){
+
+labels[target]=
+"L"+
+std::to_string(
+labelNum++
+);
+}
+
+break;
+}
+
+default:
+break;
+}
+}
+
+return labels;
+}
+
 
 void Disassembler::print(
 
@@ -53,8 +129,12 @@ const std::unordered_map<
 uint8_t,
 std::string
 >& variables
-
 ){
+
+auto labels=
+collectLabels(
+bytecode
+);
 
 size_t ip=0;
 
@@ -64,6 +144,14 @@ std::cout
 while(ip<bytecode.size()){
 
 size_t current=ip;
+
+if(labels.count(current)){
+
+std::cout
+<<"\n"
+<<labels[current]
+<<":\n";
+}
 
 Opcode op=
 static_cast<Opcode>(
@@ -86,10 +174,12 @@ switch(op){
 case Opcode::PUSH_INT:{
 
 int64_t val=
-readInt64(bytecode,ip);
+readInt64(
+bytecode,
+ip
+);
 
 std::cout
-<<std::left
 <<std::setw(18)
 <<"PUSH_INT"
 <<val
@@ -104,7 +194,6 @@ bool val=
 bytecode[ip++];
 
 std::cout
-<<std::left
 <<std::setw(18)
 <<"PUSH_BOOL"
 <<(val?"true":"false")
@@ -119,21 +208,24 @@ int idx=
 bytecode[ip++];
 
 std::string name=
+
 variables.count(idx)
+
 ?
+
 variables.at(idx)
+
 :
+
 "?";
 
 std::cout
-<<std::left
 <<std::setw(18)
 <<"STORE_VAR"
 <<name
 <<"("
 <<idx
-<<")"
-<<"   [keep stack]";
+<<") [keep stack]";
 
 break;
 }
@@ -144,21 +236,24 @@ int idx=
 bytecode[ip++];
 
 std::string name=
+
 variables.count(idx)
+
 ?
+
 variables.at(idx)
+
 :
+
 "?";
 
 std::cout
-<<std::left
 <<std::setw(18)
 <<"LOAD_VAR"
 <<name
 <<"("
 <<idx
-<<")"
-<<"   [push1]";
+<<") [push1]";
 
 break;
 }
@@ -220,7 +315,10 @@ break;
 case Opcode::JUMP_IF_FALSE:{
 
 int32_t offset=
-readInt32(bytecode,ip);
+readInt32(
+bytecode,
+ip
+);
 
 int target=
 ip+offset;
@@ -228,11 +326,8 @@ ip+offset;
 std::cout
 <<std::setw(18)
 <<"JUMP_IF_FALSE"
-<<"offset("
-<<(offset>=0?"+":"")
-<<offset
-<<") -> "
-<<target;
+<<"-> "
+<<labels[target];
 
 break;
 }
@@ -240,7 +335,10 @@ break;
 case Opcode::JUMP:{
 
 int32_t offset=
-readInt32(bytecode,ip);
+readInt32(
+bytecode,
+ip
+);
 
 int target=
 ip+offset;
@@ -248,11 +346,8 @@ ip+offset;
 std::cout
 <<std::setw(18)
 <<"JUMP"
-<<"offset("
-<<(offset>=0?"+":"")
-<<offset
-<<") -> "
-<<target;
+<<"-> "
+<<labels[target];
 
 break;
 }
@@ -292,10 +387,10 @@ std::cout
 break;
 }
 
-std::cout<<std::endl;
-
+std::cout
+<<std::endl;
 }
 
 std::cout
-<<"=======================\n";
+<<"\n=======================\n";
 }
