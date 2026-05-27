@@ -2,6 +2,7 @@
 #include "Parser.h"
 #include "Compiler.h"
 #include "VM.h"
+#include "Disassembler.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -33,11 +34,15 @@ int main(int argc, char* argv[]) {
         std::vector<uint8_t> bytecode = compiler.compile(stmts);
 
         // Print bytecode
-        std::cout << "--- Bytecode ---" << std::endl;
-        for (size_t i = 0; i < bytecode.size(); i++) {
-            std::cout << std::hex << (int)bytecode[i] << " ";
-        }
-        std::cout << std::dec << "\n----------------\n" << std::endl;
+        // std::cout << "--- Bytecode ---" << std::endl;
+        // for (size_t i = 0; i < bytecode.size(); i++) {
+        //     std::cout << std::hex << (int)bytecode[i] << " ";
+        // }
+        // std::cout << std::dec << "\n----------------\n" << std::endl;
+        
+
+        //new bytecode better
+        Disassembler::print(bytecode);
 
         VM vm;
         vm.execute(bytecode);
