@@ -13,9 +13,9 @@ int main(int argc,char* argv[])
     Compiler compiler;
     VM vm;
 
-    try{
+    bool showDisasm=true;
 
-        // REPL MODE
+    try{
 
         if(argc==1){
 
@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
             <<"===== CVM REPL =====\n";
 
             std::cout
-            <<"Type exit to quit\n\n";
+            <<"Type :help for commands\n\n";
 
             while(true){
 
@@ -40,9 +40,55 @@ int main(int argc,char* argv[])
                 line
                 );
 
-                if(line=="exit"){
+                // COMMANDS
+
+                if(line==":quit" ||
+                   line=="exit"){
 
                     break;
+                }
+
+                if(line==":help"){
+
+                    std::cout
+                    <<"\nCommands:\n"
+                    <<":help\n"
+                    <<":quit\n"
+                    <<":clear\n"
+                    <<":disasm on\n"
+                    <<":disasm off\n\n";
+
+                    continue;
+                }
+
+                if(line==":clear"){
+
+                    for(int i=0;i<30;i++){
+
+                        std::cout<<"\n";
+                    }
+
+                    continue;
+                }
+
+                if(line==":disasm on"){
+
+                    showDisasm=true;
+
+                    std::cout
+                    <<"Disassembler enabled\n";
+
+                    continue;
+                }
+
+                if(line==":disasm off"){
+
+                    showDisasm=false;
+
+                    std::cout
+                    <<"Disassembler disabled\n";
+
+                    continue;
                 }
 
                 if(line.empty()){
@@ -60,8 +106,6 @@ int main(int argc,char* argv[])
                     else if(c=='}')
                         openBraces--;
                 }
-
-                // multiline mode
 
                 while(openBraces>0){
 
@@ -107,13 +151,16 @@ int main(int argc,char* argv[])
                     stmts
                     );
 
-                    Disassembler::print(
+                    if(showDisasm){
 
-                    bytecode,
+                        Disassembler::print(
 
-                    compiler.getVariableNames()
+                        bytecode,
 
-                    );
+                        compiler.getVariableNames()
+
+                        );
+                    }
 
                     vm.execute(
                     bytecode
@@ -125,19 +172,14 @@ int main(int argc,char* argv[])
                 ){
 
                     std::cerr
-
                     <<"Error: "
-
                     <<e.what()
-
                     <<"\n";
                 }
             }
 
             return 0;
         }
-
-        // OLD SCRIPT MODE
 
         if(argc!=2){
 
@@ -188,18 +230,19 @@ int main(int argc,char* argv[])
         stmts
         );
 
-        Disassembler::print(
+        if(showDisasm){
 
-        bytecode,
+            Disassembler::print(
 
-        compiler.getVariableNames()
+            bytecode,
 
-        );
+            compiler.getVariableNames()
+            );
+        }
 
         vm.execute(
         bytecode
         );
-
     }
 
     catch(
