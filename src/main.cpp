@@ -15,7 +15,7 @@ int main(int argc,char* argv[])
 
     try{
 
-        // REPL mode
+        // REPL MODE
 
         if(argc==1){
 
@@ -27,34 +27,76 @@ int main(int argc,char* argv[])
 
             while(true){
 
+                std::string source;
+                std::string line;
+
+                int openBraces=0;
+
                 std::cout
                 <<"CVM> ";
 
-                std::string source;
-
                 std::getline(
                 std::cin,
-                source
+                line
                 );
 
-                if(source=="exit"){
+                if(line=="exit"){
 
                     break;
                 }
 
-                if(source.empty()){
+                if(line.empty()){
 
                     continue;
                 }
 
+                source+=line+"\n";
+
+                for(char c:line){
+
+                    if(c=='{')
+                        openBraces++;
+
+                    else if(c=='}')
+                        openBraces--;
+                }
+
+                // multiline mode
+
+                while(openBraces>0){
+
+                    std::cout
+                    <<"... ";
+
+                    std::getline(
+                    std::cin,
+                    line
+                    );
+
+                    source+=line+"\n";
+
+                    for(char c:line){
+
+                        if(c=='{')
+                            openBraces++;
+
+                        else if(c=='}')
+                            openBraces--;
+                    }
+                }
+
                 try{
 
-                    Lexer lexer(source);
+                    Lexer lexer(
+                    source
+                    );
 
                     auto tokens=
                     lexer.tokenize();
 
-                    Parser parser(tokens);
+                    Parser parser(
+                    tokens
+                    );
 
                     auto stmts=
                     parser.parse();
@@ -76,7 +118,6 @@ int main(int argc,char* argv[])
                     vm.execute(
                     bytecode
                     );
-
                 }
 
                 catch(
@@ -96,7 +137,7 @@ int main(int argc,char* argv[])
             return 0;
         }
 
-        // Old script mode
+        // OLD SCRIPT MODE
 
         if(argc!=2){
 
@@ -113,11 +154,8 @@ int main(int argc,char* argv[])
         if(!file.is_open()){
 
             std::cerr
-
             <<"Failed to open file: "
-
             <<argv[1]
-
             <<"\n";
 
             return 1;
@@ -125,17 +163,22 @@ int main(int argc,char* argv[])
 
         std::stringstream buffer;
 
-        buffer<<file.rdbuf();
+        buffer
+        <<file.rdbuf();
 
         std::string source=
         buffer.str();
 
-        Lexer lexer(source);
+        Lexer lexer(
+        source
+        );
 
         auto tokens=
         lexer.tokenize();
 
-        Parser parser(tokens);
+        Parser parser(
+        tokens
+        );
 
         auto stmts=
         parser.parse();
@@ -164,11 +207,8 @@ int main(int argc,char* argv[])
     ){
 
         std::cerr
-
         <<"Error: "
-
         <<e.what()
-
         <<"\n";
 
         return 1;
