@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <cstdint>
 #include <cstddef>
@@ -33,6 +34,14 @@ size_t& ip
 static int32_t readInt32(
 const std::vector<uint8_t>& bytecode,
 size_t& ip
+);
+
+static std::unordered_map<
+int,
+std::string
+> collectLabels(
+
+const std::vector<uint8_t>& bytecode
 );
 
 };
